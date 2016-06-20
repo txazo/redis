@@ -47,26 +47,38 @@ struct __attribute__ ((__packed__)) sdshdr5 {
     unsigned char flags; /* 3 lsb of type, and 5 msb of string length */
     char buf[];
 };
+
+// 源码解析: SDS结构体
 struct __attribute__ ((__packed__)) sdshdr8 {
+    // 源码解析: 已使用长度(1字节)
     uint8_t len; /* used */
+    // 源码解析: 申请的长度(1字节)
     uint8_t alloc; /* excluding the header and null terminator */
+    // 源码解析: 类型标记
     unsigned char flags; /* 3 lsb of type, 5 unused bits */
+    // 源码解析: 字符串
     char buf[];
 };
 struct __attribute__ ((__packed__)) sdshdr16 {
+    // 源码解析: 已使用长度(2字节)
     uint16_t len; /* used */
+    // 源码解析: 申请的长度(2字节)
     uint16_t alloc; /* excluding the header and null terminator */
     unsigned char flags; /* 3 lsb of type, 5 unused bits */
     char buf[];
 };
 struct __attribute__ ((__packed__)) sdshdr32 {
+    // 源码解析: 已使用长度(4字节)
     uint32_t len; /* used */
+    // 源码解析: 申请的长度(4字节)
     uint32_t alloc; /* excluding the header and null terminator */
     unsigned char flags; /* 3 lsb of type, 5 unused bits */
     char buf[];
 };
 struct __attribute__ ((__packed__)) sdshdr64 {
+    // 源码解析: 已使用长度(8字节)
     uint64_t len; /* used */
+    // 源码解析: 申请的长度(8字节)
     uint64_t alloc; /* excluding the header and null terminator */
     unsigned char flags; /* 3 lsb of type, 5 unused bits */
     char buf[];
