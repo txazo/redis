@@ -44,40 +44,63 @@
 /* Unused arguments generate annoying warnings... */
 #define DICT_NOTUSED(V) ((void) V)
 
+// 源码解析: hash表节点
 typedef struct dictEntry {
+    // 键
     void *key;
+    // 值
     union {
         void *val;
         uint64_t u64;
         int64_t s64;
         double d;
     } v;
+    // 下一个节点, 构成链表, 解决hash键冲突
     struct dictEntry *next;
 } dictEntry;
 
+// 源码解析: 字典类型
 typedef struct dictType {
+    // hash函数, 计算key的hash
     unsigned int (*hashFunction)(const void *key);
+    // 复制键
     void *(*keyDup)(void *privdata, const void *key);
+    // 复制值
     void *(*valDup)(void *privdata, const void *obj);
+    // 对比键
     int (*keyCompare)(void *privdata, const void *key1, const void *key2);
+    // 销毁键
     void (*keyDestructor)(void *privdata, void *key);
+    // 销毁值
     void (*valDestructor)(void *privdata, void *obj);
 } dictType;
 
 /* This is our hash table structure. Every dictionary has two of this as we
  * implement incremental rehashing, for the old to the new table. */
+
+// 源码解析: hash表结构
 typedef struct dictht {
+    // hash表数组
     dictEntry **table;
+    // hash表大小
     unsigned long size;
+    // hash表大小掩码, 值为size - 1
     unsigned long sizemask;
+    // hash表中的节点数量
     unsigned long used;
 } dictht;
 
+// 源码解析: 字典
 typedef struct dict {
+    // 类型函数
     dictType *type;
+    // 私有数据
     void *privdata;
+    // hash表数组, 大小为2, 使用h[0], h[1]用来rehash
     dictht ht[2];
+    // rehash索引, 记录rehash的进度, 为-1时, 表示当前没有在进行rehash
     long rehashidx; /* rehashing not in progress if rehashidx == -1 */
+    // 正在迭代的迭代器数量
     int iterators; /* number of iterators currently running */
 } dict;
 

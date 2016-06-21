@@ -165,6 +165,7 @@ static void _dictReset(dictht *ht)
 }
 
 /* Create a new hash table */
+// 创建一个新的hash表
 dict *dictCreate(dictType *type,
         void *privDataPtr)
 {
@@ -175,6 +176,7 @@ dict *dictCreate(dictType *type,
 }
 
 /* Initialize the hash table */
+// 初始化hash表
 int _dictInit(dict *d, dictType *type,
         void *privDataPtr)
 {
