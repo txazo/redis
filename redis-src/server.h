@@ -456,11 +456,24 @@ typedef long long mstime_t; /* millisecond time type. */
 #define LRU_BITS 24
 #define LRU_CLOCK_MAX ((1<<LRU_BITS)-1) /* Max value of obj->lru */
 #define LRU_CLOCK_RESOLUTION 1000 /* LRU clock resolution in ms */
+
+// Redis对象类型
+// OBJ_STRING   0   字符串对象, string
+// OBJ_LIST     1   列表对象, list
+// OBJ_SET      2   集合对象, set
+// OBJ_ZSET     3   有序集合对象, zset
+// OBJ_HASH     4   哈希对象, hash
+
+// 源码解析: Redis对象
 typedef struct redisObject {
+    // 类型, 参见上面的Redis对象类型
     unsigned type:4;
+    // 编码
     unsigned encoding:4;
     unsigned lru:LRU_BITS; /* lru time (relative to server.lruclock) */
+    // 引用计数
     int refcount;
+    // 数据结构指针
     void *ptr;
 } robj;
 
