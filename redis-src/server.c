@@ -1857,8 +1857,11 @@ void initServer(void) {
     server.clients_paused = 0;
     server.system_memory_size = zmalloc_get_memory_size();
 
+    // 创建共享对象
     createSharedObjects();
     adjustOpenFilesLimit();
+
+    // 创建事件模型
     server.el = aeCreateEventLoop(server.maxclients+CONFIG_FDSET_INCR);
     server.db = zmalloc(sizeof(redisDb)*server.dbnum);
 
@@ -1886,11 +1889,16 @@ void initServer(void) {
     }
 
     /* Create the Redis databases, and initialize other internal state. */
+
+    // 创建Redis数据库, 并初始化内部状态
     for (j = 0; j < server.dbnum; j++) {
+        // 数据字典
         server.db[j].dict = dictCreate(&dbDictType,NULL);
         server.db[j].expires = dictCreate(&keyptrDictType,NULL);
+        // 阻塞key集合
         server.db[j].blocking_keys = dictCreate(&keylistDictType,NULL);
         server.db[j].ready_keys = dictCreate(&setDictType,NULL);
+        // 监视key集合
         server.db[j].watched_keys = dictCreate(&keylistDictType,NULL);
         server.db[j].eviction_pool = evictionPoolAlloc();
         server.db[j].id = j;
@@ -3947,6 +3955,8 @@ int main(int argc, char **argv) {
     gettimeofday(&tv,NULL);
     dictSetHashFunctionSeed(tv.tv_sec^tv.tv_usec^getpid());
     server.sentinel_mode = checkForSentinelMode(argc,argv);
+
+    // 初始化server配置
     initServerConfig();
 
     /* Store the executable path and arguments in a safe place in order
@@ -4042,6 +4052,7 @@ int main(int argc, char **argv) {
     int background = server.daemonize && !server.supervised;
     if (background) daemonize();
 
+    // 初始化server
     initServer();
     if (background || server.pidfile) createPidFile();
     redisSetProcTitle(argv[0]);

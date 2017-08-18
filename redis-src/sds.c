@@ -54,6 +54,7 @@ static inline int sdsHdrSize(char type) {
     return 0;
 }
 
+// 根据字符串大小确定sds类型
 static inline char sdsReqType(size_t string_size) {
     if (string_size < 1<<5)
         return SDS_TYPE_5;
