@@ -62,20 +62,34 @@ typedef void aeEventFinalizerProc(struct aeEventLoop *eventLoop, void *clientDat
 typedef void aeBeforeSleepProc(struct aeEventLoop *eventLoop);
 
 /* File event structure */
+
+// 文件事件结构
 typedef struct aeFileEvent {
+    // 读/写标记
     int mask; /* one of AE_(READABLE|WRITABLE) */
+    // 读处理回调函数
     aeFileProc *rfileProc;
+    // 写处理回调函数
     aeFileProc *wfileProc;
+    // 回调参数
     void *clientData;
 } aeFileEvent;
 
 /* Time event structure */
+
+// 时间事件结构
 typedef struct aeTimeEvent {
+    // 标识id
     long long id; /* time event identifier. */
+    // 秒
     long when_sec; /* seconds */
+    // 毫秒
     long when_ms; /* milliseconds */
+    // 定时回调函数
     aeTimeProc *timeProc;
+    // 定时事件清理函数
     aeEventFinalizerProc *finalizerProc;
+    // 回调参数
     void *clientData;
     struct aeTimeEvent *next;
 } aeTimeEvent;
@@ -87,6 +101,8 @@ typedef struct aeFiredEvent {
 } aeFiredEvent;
 
 /* State of an event based program */
+
+// 事件循环结构体
 typedef struct aeEventLoop {
     int maxfd;   /* highest file descriptor currently registered */
     int setsize; /* max number of file descriptors tracked */

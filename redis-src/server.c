@@ -2227,6 +2227,8 @@ void call(client *c, int flags) {
     /* Call the command. */
     dirty = server.dirty;
     start = ustime();
+
+    // 执行命令
     c->cmd->proc(c);
     duration = ustime()-start;
     dirty = server.dirty-dirty;
@@ -3392,6 +3394,8 @@ void evictionPoolPopulate(dict *sampledict, dict *keydict, struct evictionPoolEn
          * again in the key dictionary to obtain the value object. */
         if (sampledict != keydict) de = dictFind(keydict, key);
         o = dictGetVal(de);
+
+        // 计算最近未访问时间
         idle = estimateObjectIdleTime(o);
 
         /* Insert the element inside the pool.
@@ -4088,6 +4092,7 @@ int main(int argc, char **argv) {
     }
 
     aeSetBeforeSleepProc(server.el,beforeSleep);
+    // 事件main
     aeMain(server.el);
     aeDeleteEventLoop(server.el);
     return 0;

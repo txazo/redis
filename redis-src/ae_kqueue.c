@@ -116,6 +116,7 @@ static int aeApiPoll(aeEventLoop *eventLoop, struct timeval *tvp) {
                         NULL);
     }
 
+    // 已就绪的事件数量
     if (retval > 0) {
         int j;
 
@@ -124,7 +125,9 @@ static int aeApiPoll(aeEventLoop *eventLoop, struct timeval *tvp) {
             int mask = 0;
             struct kevent *e = state->events+j;
 
+            // 读事件
             if (e->filter == EVFILT_READ) mask |= AE_READABLE;
+            // 写事件
             if (e->filter == EVFILT_WRITE) mask |= AE_WRITABLE;
             eventLoop->fired[j].fd = e->ident;
             eventLoop->fired[j].mask = mask;

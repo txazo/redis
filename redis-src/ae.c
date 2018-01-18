@@ -351,18 +351,23 @@ int aeProcessEvents(aeEventLoop *eventLoop, int flags)
     int processed = 0, numevents;
 
     /* Nothing to do? return ASAP */
+
+    // 非时间时间和文件事件, 直接返回0
     if (!(flags & AE_TIME_EVENTS) && !(flags & AE_FILE_EVENTS)) return 0;
 
     /* Note that we want call select() even if there are no
      * file events to process as long as we want to process time
      * events, in order to sleep until the next time event is ready
      * to fire. */
+
+    // 是文件事件(当前注册的文件句柄不等于-1)或时间事件
     if (eventLoop->maxfd != -1 ||
         ((flags & AE_TIME_EVENTS) && !(flags & AE_DONT_WAIT))) {
         int j;
         aeTimeEvent *shortest = NULL;
         struct timeval tv, *tvp;
 
+        // 时间事件
         if (flags & AE_TIME_EVENTS && !(flags & AE_DONT_WAIT))
             shortest = aeSearchNearestTimer(eventLoop);
         if (shortest) {
@@ -385,19 +390,26 @@ int aeProcessEvents(aeEventLoop *eventLoop, int flags)
                 tvp->tv_usec = 0;
             }
         } else {
+            // 非时间事件
+
             /* If we have to check for events but need to return
              * ASAP because of AE_DONT_WAIT we need to set the timeout
              * to zero */
             if (flags & AE_DONT_WAIT) {
                 tv.tv_sec = tv.tv_usec = 0;
+                // 过期时间设为0
                 tvp = &tv;
             } else {
                 /* Otherwise we can block */
+                // 无过期时间, 等待
                 tvp = NULL; /* wait forever */
             }
         }
 
+        // poll已就绪的文件事件
         numevents = aeApiPoll(eventLoop, tvp);
+
+        // 循环处理文件事件
         for (j = 0; j < numevents; j++) {
             aeFileEvent *fe = &eventLoop->events[eventLoop->fired[j].fd];
             int mask = eventLoop->fired[j].mask;
@@ -407,18 +419,26 @@ int aeProcessEvents(aeEventLoop *eventLoop, int flags)
 	    /* note the fe->mask & mask & ... code: maybe an already processed
              * event removed an element that fired and we still didn't
              * processed, so we check if the event is still valid. */
+
+            // 读事件
             if (fe->mask & mask & AE_READABLE) {
                 rfired = 1;
+                // 读事件处理
                 fe->rfileProc(eventLoop,fd,fe->clientData,mask);
             }
+
+            // 写事件
             if (fe->mask & mask & AE_WRITABLE) {
                 if (!rfired || fe->wfileProc != fe->rfileProc)
+
                     fe->wfileProc(eventLoop,fd,fe->clientData,mask);
             }
             processed++;
         }
     }
     /* Check time events */
+
+    // 处理时间事件
     if (flags & AE_TIME_EVENTS)
         processed += processTimeEvents(eventLoop);
 
@@ -449,9 +469,13 @@ int aeWait(int fd, int mask, long long milliseconds) {
 
 void aeMain(aeEventLoop *eventLoop) {
     eventLoop->stop = 0;
+
+    // 处理事件循环
     while (!eventLoop->stop) {
         if (eventLoop->beforesleep != NULL)
             eventLoop->beforesleep(eventLoop);
+
+        // 处理所有事件
         aeProcessEvents(eventLoop, AE_ALL_EVENTS);
     }
 }
